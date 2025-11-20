@@ -30,11 +30,11 @@ The features are all numeric data, so I applied a standard scalar in order to en
 
 In addition to my first logistic regression, I created 2 other logistic regression where I experimented with the ground truth for the target variable. In one model I made the like class for the enjoyment_score >= 5, for another model I made the like class for enjoyment_score >= 7.
 
-Addionally, I created a linear SVM that used ground truth of liked for enjoyment_score >=6. Of all these models, the first logistic regression baseline seemed to perform the best.
+Additionally, I created a linear SVM that used ground truth of liked for enjoyment_score >=6. Of all these models, the first logistic regression baseline seemed to perform the best.
 
 # Model Evaluation
 
-For evaluation I computed accuracy, precision, and recall for each fold. I computed the mean of each metric across all folds. My baseline logistic regression (with enjoyment_score >= 6 as liked and < 6 as not liked), I achieved a 62.5% accuracy for my best baseline logistic regression. Addionally, I computed precision and recall on the whole data itself (Pooled Across Participants) in addion to the per fold average of precision and recall. This is because for some folds, one class is not defined. By computing precision and recall pooled across the whole dataset from each fold, I ignore the case where the class is missing.
+For evaluation I computed accuracy, precision, and recall for each fold. I computed the mean of each metric across all folds. My baseline logistic regression (with enjoyment_score >= 6 as liked and < 6 as not liked), I achieved a 62.5% accuracy for my best baseline logistic regression. Additionally, I computed precision and recall on the whole data itself (Pooled Across Participants) in addition to the per fold average of precision and recall. This is because for some folds, one class is not defined. By computing precision and recall pooled across the whole dataset from each fold, I ignore the case where the class is missing.
 
 **Best Baseline Logistic Regression**
 
@@ -49,7 +49,7 @@ This baseline is a solid starting point. It performs better than random from a s
 The weakness of this model is that it has mediocre performance as evaluated by accuracy, precision, and recall. Addionally, since badpower features were aggregated over the entire song, the model cannot capture temporal dynamics like short-term burst in specific frequencies. A weakness overall is that this dataset is extremely small. Any models trained will have this weakness though.
 
 **Possible reasons for errors or bias**
-Since this is a very small dataset with class imalance, perhaps this could cause errors and bias in my analyisis. Addionally, simple version of features were created, more in-depth features will be created, however simple features may not fully be captuing the complexity within the data.
+Since this is a very small dataset with class imalance, perhaps this could cause errors and bias in my analyisis. Additionally, simple version of features were created, more in-depth features will be created, however simple features may not fully be captuing the complexity within the data.
 
 # Ideas from Initial Modeling/Next Goals
 
@@ -63,7 +63,7 @@ Based on the performance of my initial baseline model, there are several directi
 
 - log bandpower: taking the log of bandpower
 
-**Addionally, future exploration may incoperate the use of scalograms and spectograms.**
+**Additionally, future exploration may incoperate the use of scalograms and spectograms.**
 Scalograms are 2 dimensional time frequency representations derived from the Continous Wavelet Transform (CWT)
 
 Spectograms are 2 dimensional time frequecy representations derived from the Fast Fourier Transform (FFT)
@@ -73,7 +73,7 @@ Both these methods preserve more information than bandpower typically does which
 
 **Target Variable Ideas**
 
-Some addional ideas are changing the target variable. Currently I have the target variable as a binary not liked/liked. I could tinker with the amount of classes I have for the target feature. I could create a model that uses the current scale of 1 to 9, and try to predict across 9 classes. Another idea would be to create a disliked, neutral, and liked classes. For this, I would use 1-3 as dislked, 4-6 as neutral and 7-9 as liked. 
+Some additional ideas are changing the target variable. Currently I have the target variable as a binary not liked/liked. I could tinker with the amount of classes I have for the target feature. I could create a model that uses the current scale of 1 to 9, and try to predict across 9 classes. Another idea would be to create a disliked, neutral, and liked classes. For this, I would use 1-3 as dislked, 4-6 as neutral and 7-9 as liked. 
 
 **Tuning**
 
