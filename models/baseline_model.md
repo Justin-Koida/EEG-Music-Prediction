@@ -4,7 +4,7 @@ I explored initial models with the provided cleaened EEG data. The structured of
 
 In this initial model, I wanted to create a solid baseline for which I could compare future models. Since I used the data cleaned by the researchers of this dataset, this provides data for solid baseline which I can compare to future models created from this data, and also future models where I apply my own cleaning techniques. 
 
-For this model, I computed power across different frequencies for each channel in every song for a given participant. For EEG, this is a standard feature that is calculated and great for baseline models. I calculated power based off the following Band frequency mapping:
+For this model, I computed bandpower across different frequencies for each channel in every song for a given participant. For EEG, this is a standard feature that is calculated and great for baseline models. I calculated power based off the following Band frequency mapping:
 
 BANDS = {
     "delta": (1, 4),
@@ -14,41 +14,72 @@ BANDS = {
     "gamma_low": (30, 45),
 }
 
+The ranges above are just standard frequency ranges for brain waves. 
+
+Bandpower measures the total energy an EEG signal contains within a specific frequency range (delta, theta, etc.). I computed this using Power Spectral Density (PSD) estimate derived from Weltch's method. Bandpower is then calculated by integrating the PSD using upper and lower bounds according to frequency ranges (called 'BANDS' in my code).
+
 It is important to note that for each song and participant I computed power across the full time and did not chunk into windows. 
 
 # Initial Model
 
-For my initial model, I tested a simiple logistic regression baseline. I converted user's enjoyment score to a binary target representing not liked or liked. I defined liked as any score greater than or equal to 6, and not liked as anything below 6 (enjoyment score is a discrete scale from 1 to 9).
+For my initial model, I tested a simiple logistic regression baseline. I converted user's enjoyment score to a binary target representing not liked or liked. I defined liked as any enjoyment_score greater than or equal to 6, and not liked as anything below 6 (enjoyment score is a discrete scale from 1 to 9).
 
 Features in this model included only the power features calculated per channel. With 10 songs for each 20 participants, there are 10 x 20 = 200 observations in my dataset. With 125 channels across 5 frequency ranges, there are 125 x 5 = 625 features in my dataset.
 
 The features are all numeric data, so I applied a standard scalar in order to ensure all features are on the same scale. I applied cross validation in order to ensure robust evaluation metrics since I have an extremely small dataset. I used a Leave One Group Out cross validation technique in order to ensure no leakage when evaluating (having a standard split would mean the model gets trained on a participant and may memorize participant specific patters). In this technique, I had 20 splits each had a participant left out and used as the test set.
 
+In addition to my first logistic regression, I created 2 other logistic regression where I experimented with the ground truth for the target variable. In one model I made the like class for the enjoyment_score >= 5, for another model I made the like class for enjoyment_score >= 7.
+
+Addionally, I created a linear SVM that used ground truth of liked for enjoyment_score >=6. Of all these models, the first logistic regression baseline seemed to perform the best.
 
 # Model Evaluation
 
-For evaluation I computed accuracy, precision, and recall for each fold. I computed the mean of each metric across all folds. My baseline logistic regression (with enjoyment >= 6 as liked and < 6 as disliked), I achieved a 62.5% accuracy, 
+For evaluation I computed accuracy, precision, and recall for each fold. I computed the mean of each metric across all folds. My baseline logistic regression (with enjoyment_score >= 6 as liked and < 6 as not liked), I achieved a 62.5% accuracy for my best baseline logistic regression. Addionally, I computed precision and recall on the whole data itself (Pooled Across Participants) in addion to the per fold average of precision and recall. This is because for some folds, one class is not defined. By computing precision and recall pooled across the whole dataset from each fold, I ignore the case where the class is missing.
 
+**Best Baseline Logistic Regression**
 
-# Ideas from Initial Modeling/Next Goals
+![alt text](<Screenshot 2025-11-19 at 10.02.14 PM.png>)
 
-Based on my initial model, I have a few ideas of what I want to explore next. First, I could change up the power features in my model. There are techniques for capturing power within a specific time frame. This could lead to more accurate results.
+*Pooled across partcipants (not mean of folds) for baseline logistic regression with target variabed defined as enjoyment_score >= 6 as class 1 (liked) and enjoyment_score <6 as class 0 (not liked)*
 
-Addionally, future models could incoperate the use of scalograms and spectograms. 
-
-Scalograms are _
-
-Spectograms are_
-
-
-Some addional ideas are changing the target variable. Currently I have the target variable as a binary not liked/liked. I could tinker with the amount of classes I have for the target feature. I could create a model that uses the current scale of 1 to 9, and try to predict across 9 classes. Another idea would be to create a disliked, neutral, and liked classes. For this, I would use 1-3 as dislked, 4-6 as neutral and 7-9 as liked. 
-
+**Strengths and weaknesses of the baseline**
 
 This baseline is a solid starting point. It performs better than random from a simplistic power feature calculation. This baseline allows for easy comparison to how future feature engineering impacts model performance compared to a simplistic power feature based model. 
 
-The weakness of this model is that it has mediocre performance as evaluated by accuracy, precision, and recall. A weakness overall is that this dataset is extremely small. Any models trained will have this weakness though.
+The weakness of this model is that it has mediocre performance as evaluated by accuracy, precision, and recall. Addionally, since badpower features were aggregated over the entire song, the model cannot capture temporal dynamics like short-term burst in specific frequencies. A weakness overall is that this dataset is extremely small. Any models trained will have this weakness though.
 
-# Future Directions
+**Possible reasons for errors or bias**
+Since this is a very small dataset with class imalance, perhaps this could cause errors and bias in my analyisis. Addionally, simple version of features were created, more in-depth features will be created, however simple features may not fully be captuing the complexity within the data.
+
+# Ideas from Initial Modeling/Next Goals
+
+Based on the performance of my initial baseline model, there are several directions that I plan to explore to improve prediction accuracy and more deeply capture the neural dynamics present in the EEG data.
+
+**Future feature exploration related to bandpower will include:**
+
+- sliding window bandpower: an approach to capture temporal components of bandpower by computing power in short windows (windows being time frames e.g. 2 second window).
+
+- relative bandpower: this is just power in a band normalize by the total power
+
+- log bandpower: taking the log of bandpower
+
+**Addionally, future exploration may incoperate the use of scalograms and spectograms.**
+Scalograms are 2 dimensional time frequency representations derived from the Continous Wavelet Transform (CWT)
+
+Spectograms are 2 dimensional time frequecy representations derived from the Fast Fourier Transform (FFT)
+
+Both these methods preserve more information than bandpower typically does which will allow for the model to capture more meaningful patterns. Since these can be represented as images, a CNN can be trained on the generated scalograms and spectograms.
+
+
+**Target Variable Ideas**
+
+Some addional ideas are changing the target variable. Currently I have the target variable as a binary not liked/liked. I could tinker with the amount of classes I have for the target feature. I could create a model that uses the current scale of 1 to 9, and try to predict across 9 classes. Another idea would be to create a disliked, neutral, and liked classes. For this, I would use 1-3 as dislked, 4-6 as neutral and 7-9 as liked. 
+
+**Tuning**
+
+Did not apply hyperparameter tuning, this will be important to incoperate for future more in-depth models.
+
+# Long-term Future Directions
 
 Currently I use the cleaned EEG data provided by the creators of this dataset. I would like to clean the raw EEG file myself in order to incorperate some ideas that I have. 
 
