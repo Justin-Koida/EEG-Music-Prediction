@@ -10,10 +10,14 @@ Understanding how an individual responds to music has been a topic of interest i
 The ability to determine a listener's enjoyment of a song can largely impact the current knowledge of the brain. By extracting frequency domain features and applying supervised machine learning models, I evaluate the strength of the relationship between neural activity represented through EEG and subjective music enjoyment. This project offers contribution to the larger effort of integrating neuroscience and machine learning.
 
 ## Data 
-The Data utilized in this project was taken from the Naturalistic Music EEG Dataset – Tempo (NMED-T). In this study, Stanford researchers conducted a multifaceted experiment measuring responses to natural music listening. There were 20 participants in this study, and each listened to 10 specific songs as shown in table xxx. Participants were tasked with listening to these songs while researchers collected EEG data through 128 electrodes placed on targeted areas around the brain. 
+The data utilized in this project was taken from the Naturalistic Music EEG Dataset – Tempo (NMED-T). In this study, Stanford researchers conducted a multifaceted experiment measuring responses to natural music listening. There were 20 participants in this study, and each listened to 10 specific songs as shown in table xxx. Participants were tasked with listening to these songs while researchers collected EEG data through 128 electrodes placed on targeted areas around the brain. 
 More information about how the study was set up can be found in the citation section.
 
 Researchers provided a cleaned dataset in the form of 10 .mat files, raw EEG files for each participant, participant information, and participant ratings. In this project I utilized the cleaned EEG data. The structure of the cleaned EEG is as follows. There are 10 cleaned EEG files, each file corresponding to one song. Each file is a .mat file in the form (125, time, 20). This translates to 125 channels, the amount of time the data is recorded over, and 20 participants. The files are named in format song#_Imputed.mat where # is the song id. The creators of this dataset used a unique 'trigger' to song mapping which is why the song names are in this format. Note that each channel maps to an electrode used to gather data; it is also important to note that the amount of channels does not match to the amount of electrodes due to preprocessing applied by the researchers. 
+
+## Research Question
+
+Can EEG data predict whether a listener will enjoy a song?
 
 ## Feature exploration
 
@@ -98,6 +102,8 @@ img = compute_scalogram(
                 out_size=(H, W), <- Where H = 64 and W = 64
                 target_fs=64,
             )
+
+This model can be viewed in models/scalogram_best.ipynb.
 
 ## Limitations
 
